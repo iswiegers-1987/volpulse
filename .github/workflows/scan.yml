@@ -1,1 +1,38 @@
+name: VolPulse scan
 
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes (GitHub may add a few minutes of delay)
+  workflow_dispatch: {}       # lets you trigger a scan manually from the Actions tab
+
+permissions:A
+  contents: write             # needed to save state.json back to the repo
+
+concurrency:
+  group: volpulse
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scanner
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python monitor.py
+
+      - name: Remember alerted coins
+        run: |
+          git config user.name "volpulse-bot"
+          git config user.email "volpulse-bot@users.noreply.github.com"
+          git add state.json
+          git diff --cached --quiet || git commit -m "update alert state [skip ci]"
+          git pull --rebase origin ${GITHUB_REF_NAME} || true
+          git push
