@@ -2,11 +2,11 @@ name: VolPulse scan
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes (GitHub may add a few minutes of delay)
-  workflow_dispatch: {}       # lets you trigger a scan manually from the Actions tab
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
 
 permissions:
-  contents: write             # needed to save state.json back to the repo
+  contents: write
 
 concurrency:
   group: volpulse
