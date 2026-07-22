@@ -5,7 +5,7 @@ on:
     - cron: "*/10 * * * *"   # every 10 minutes (GitHub may add a few minutes of delay)
   workflow_dispatch: {}       # lets you trigger a scan manually from the Actions tab
 
-permissions:A
+permissions:
   contents: write             # needed to save state.json back to the repo
 
 concurrency:
