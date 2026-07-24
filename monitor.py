@@ -47,17 +47,21 @@ def fmt_usd(n):
     return f"${n:,.0f}"
 
 
-def send_telegram(token, chat_id, text):
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    data = urllib.parse.urlencode({
-        "chat_id": chat_id,
-        "text": text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": "true",
-    }).encode()
-    req = urllib.request.Request(url, data=data)
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
+def send_telegram(token, chat_ids, text):
+    for chat_id in [c.strip() for c in chat_ids.split(",") if c.strip()]:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = urllib.parse.urlencode({
+            "chat_id": chat_id,
+            "text": text,
+            "parse_mode": "HTML",
+            "disable_web_page_preview": "true",
+        }).encode()
+        try:
+            req = urllib.request.Request(url, data=data)
+            with urllib.request.urlopen(req, timeout=30) as r:
+                json.load(r)
+        except Exception as e:
+            print(f"Failed to message {chat_id}: {e}")
 
 
 def main():
