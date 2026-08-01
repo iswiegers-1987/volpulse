@@ -1,12 +1,3 @@
 {
- "qualifying": [
-  "aave",
-  "conflux-token",
-  "dexe",
-  "ecash",
-  "first-digital-usd",
-  "pudgy-penguins",
-  "tether",
-  "zama"
- ]
+ "qualifying": []
 }
