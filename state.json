@@ -1,8 +1,11 @@
 {
  "qualifying": [
+  "conflux-token",
+  "derive",
   "dexe",
   "ecash",
   "first-digital-usd",
+  "pudgy-penguins",
   "tether",
   "zama"
  ]
