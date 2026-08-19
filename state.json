@@ -1,6 +1,5 @@
 {
  "qualifying": [
-  "cap-4",
   "cash-cat",
   "crvusd",
   "first-digital-usd",
@@ -8,6 +7,7 @@
   "plasma",
   "pudgy-penguins",
   "tether",
+  "tether-gold",
   "usd-coin",
   "usd1-wlfi"
  ]
