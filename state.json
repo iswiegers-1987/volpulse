@@ -1,7 +1,6 @@
 {
  "qualifying": [
   "arbitrum",
-  "cap-4",
   "cash-cat",
   "chiliz",
   "crvusd",
@@ -20,6 +19,7 @@
   "tether-gold",
   "united-stables",
   "usd-coin",
-  "usd1-wlfi"
+  "usd1-wlfi",
+  "worldcoin-wld"
  ]
 }
