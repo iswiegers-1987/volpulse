@@ -11,7 +11,6 @@
   "ethena",
   "fartcoin",
   "fetch-ai",
-  "filecoin",
   "first-digital-usd",
   "gala",
   "havven",
@@ -31,12 +30,12 @@
   "sonic-3",
   "sui",
   "tether",
-  "tether-gold",
   "the-sandbox",
   "thorchain",
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
-  "virtual-protocol"
+  "virtual-protocol",
+  "worldcoin-wld"
  ]
 }
