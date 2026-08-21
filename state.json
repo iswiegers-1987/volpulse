@@ -1,5 +1,6 @@
 {
  "qualifying": [
+  "bonk",
   "cap-4",
   "chiliz",
   "dogwifcoin",
@@ -8,6 +9,7 @@
   "fetch-ai",
   "filecoin",
   "first-digital-usd",
+  "injective-protocol",
   "meteora",
   "monad",
   "official-trump",
@@ -18,7 +20,6 @@
   "pudgy-penguins",
   "ripple-usd",
   "tether",
-  "tether-gold",
   "usd-coin",
   "usd1-wlfi"
  ]
