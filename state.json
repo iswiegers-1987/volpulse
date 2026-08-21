@@ -1,7 +1,6 @@
 {
  "qualifying": [
   "aave",
-  "axie-infinity",
   "bonk",
   "cap-4",
   "chiliz",
@@ -13,6 +12,7 @@
   "fetch-ai",
   "filecoin",
   "first-digital-usd",
+  "havven",
   "injective-protocol",
   "layerzero",
   "monad",
@@ -35,6 +35,7 @@
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
+  "virtual-protocol",
   "worldcoin-wld"
  ]
 }
