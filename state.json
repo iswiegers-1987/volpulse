@@ -1,7 +1,6 @@
 {
  "qualifying": [
   "aave",
-  "basic-attention-token",
   "bonk",
   "cap-4",
   "cash-cat",
@@ -16,7 +15,6 @@
   "first-digital-usd",
   "gala",
   "havven",
-  "immutable-x",
   "injective-protocol",
   "layerzero",
   "monad",
@@ -38,7 +36,6 @@
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
-  "virtual-protocol",
-  "worldcoin-wld"
+  "virtual-protocol"
  ]
 }
