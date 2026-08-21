@@ -1,6 +1,9 @@
 {
  "qualifying": [
   "aave",
+  "apecoin",
+  "axie-infinity",
+  "basic-attention-token",
   "bonk",
   "cap-4",
   "chiliz",
@@ -14,8 +17,10 @@
   "first-digital-usd",
   "gala",
   "havven",
+  "immutable-x",
   "injective-protocol",
   "layerzero",
+  "lido-dao",
   "monad",
   "official-trump",
   "optimism",
