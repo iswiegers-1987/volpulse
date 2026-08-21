@@ -1,6 +1,7 @@
 {
  "qualifying": [
   "aave",
+  "axie-infinity",
   "bonk",
   "cap-4",
   "chiliz",
@@ -24,13 +25,13 @@
   "pyth-network",
   "ripple-usd",
   "societe-generale-forge-eurcv",
+  "sonic-3",
   "sui",
   "tether",
   "tether-gold",
   "thorchain",
   "united-stables",
   "usd-coin",
-  "usd1-wlfi",
-  "virtual-protocol"
+  "usd1-wlfi"
  ]
 }
