@@ -1,5 +1,6 @@
 {
  "qualifying": [
+  "1inch",
   "aave",
   "apecoin",
   "bonk",
@@ -15,11 +16,13 @@
   "fartcoin",
   "fetch-ai",
   "first-digital-usd",
+  "floki",
   "gala",
   "havven",
   "immutable-x",
   "injective-protocol",
   "layerzero",
+  "lido-dao",
   "monad",
   "official-trump",
   "optimism",
@@ -39,7 +42,6 @@
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
-  "virtual-protocol",
-  "worldcoin-wld"
+  "virtual-protocol"
  ]
 }
