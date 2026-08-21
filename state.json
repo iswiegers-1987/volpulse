@@ -2,7 +2,6 @@
  "qualifying": [
   "aave",
   "bonk",
-  "book-of-meme",
   "cap-4",
   "chiliz",
   "crvusd",
@@ -21,6 +20,7 @@
   "pepe",
   "plasma",
   "pudgy-penguins",
+  "pump-fun",
   "pyth-network",
   "ripple-usd",
   "societe-generale-forge-eurcv",
@@ -30,6 +30,7 @@
   "thorchain",
   "united-stables",
   "usd-coin",
-  "usd1-wlfi"
+  "usd1-wlfi",
+  "virtual-protocol"
  ]
 }
