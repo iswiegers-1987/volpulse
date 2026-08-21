@@ -1,6 +1,8 @@
 {
  "qualifying": [
+  "aave",
   "bonk",
+  "book-of-meme",
   "cap-4",
   "chiliz",
   "crvusd",
@@ -12,7 +14,6 @@
   "filecoin",
   "first-digital-usd",
   "injective-protocol",
-  "meteora",
   "monad",
   "official-trump",
   "optimism",
@@ -23,6 +24,7 @@
   "pyth-network",
   "ripple-usd",
   "societe-generale-forge-eurcv",
+  "sui",
   "tether",
   "tether-gold",
   "thorchain",
