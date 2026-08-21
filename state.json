@@ -8,12 +8,12 @@
   "crvusd",
   "curve-dao-token",
   "dogwifcoin",
+  "eigenlayer",
   "ethena",
   "fartcoin",
   "fetch-ai",
   "filecoin",
   "first-digital-usd",
-  "gala",
   "havven",
   "injective-protocol",
   "layerzero",
@@ -31,13 +31,11 @@
   "sonic-3",
   "sui",
   "tether",
-  "tether-gold",
   "the-sandbox",
   "thorchain",
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
-  "virtual-protocol",
-  "worldcoin-wld"
+  "virtual-protocol"
  ]
 }
