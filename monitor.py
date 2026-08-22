@@ -2,6 +2,8 @@
 VolPulse watchdog — runs on a schedule, checks CoinGecko for coins where:
   * market cap >= MIN_MCAP
   * 24h volume >= MIN_RATIO of market cap
+  * (optional) price within NEAR_ATH_PCT of its all-time high
+
 Sends a Telegram push notification for every coin that NEWLY crosses
 the threshold, and remembers previous qualifiers in state.json so you
 don't get the same alert every 10 minutes.
@@ -19,6 +21,12 @@ import urllib.request
 # ── your criteria ────────────────────────────────────────────────
 MIN_MCAP = 100_000_000   # $100M minimum market cap
 MIN_RATIO = 0.20         # 24h volume must be >= 20% of market cap
+
+# Near-ATH filter: set to True to ONLY alert on coins trading within
+# NEAR_ATH_PCT percent of their all-time high. Set to False to disable.
+NEAR_ATH_FILTER = True
+NEAR_ATH_PCT = 20        # e.g. 20 = price no more than 20% below its ATH
+
 PAGES = 3                # scan top 750 coins by market cap
 STATE_FILE = "state.json"
 
@@ -33,7 +41,7 @@ def http_get_json(url, retries=3):
             req = urllib.request.Request(url, headers={"User-Agent": "volpulse/1.0"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 return json.load(r)
-        except Exception as e:
+        except Exception:
             if attempt == retries - 1:
                 raise
             time.sleep(10 * (attempt + 1))  # back off, CoinGecko rate-limits
@@ -48,6 +56,7 @@ def fmt_usd(n):
 
 
 def send_telegram(token, chat_ids, text):
+    """Sends to one or more chat IDs (comma-separated), e.g. '123,456' or '-100987...'"""
     for chat_id in [c.strip() for c in chat_ids.split(",") if c.strip()]:
         url = f"https://api.telegram.org/bot{token}/sendMessage"
         data = urllib.parse.urlencode({
@@ -66,8 +75,8 @@ def send_telegram(token, chat_ids, text):
 
 def main():
     token = os.environ.get("TELEGRAM_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
+    chat_ids = os.environ.get("TELEGRAM_CHAT_ID")
+    if not token or not chat_ids:
         sys.exit("Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID environment variables.")
 
     # previous qualifiers
@@ -93,27 +102,39 @@ def main():
     for c in coins:
         mcap = c.get("market_cap") or 0
         vol = c.get("total_volume") or 0
-        if mcap >= MIN_MCAP and vol >= MIN_RATIO * mcap:
-            qualifiers.append(c)
+        if mcap < MIN_MCAP or vol < MIN_RATIO * mcap:
+            continue
+        if NEAR_ATH_FILTER:
+            ath_chg = c.get("ath_change_percentage")
+            # ath_change_percentage is negative: -12.5 means 12.5% below ATH
+            if ath_chg is None or ath_chg < -NEAR_ATH_PCT:
+                continue
+        qualifiers.append(c)
 
     current = {c["id"] for c in qualifiers}
     fresh = [c for c in qualifiers if c["id"] not in prev]
 
+    ath_note = f" and within {NEAR_ATH_PCT}% of their all-time high" if NEAR_ATH_FILTER else ""
+
     if first_run:
-        send_telegram(token, chat_id,
+        send_telegram(token, chat_ids,
                       f"✅ <b>VolPulse is live.</b> Scanned {len(coins)} coins; "
-                      f"{len(qualifiers)} currently meet your criteria. "
+                      f"{len(qualifiers)} currently meet your criteria{ath_note}. "
                       f"You'll be pinged when a NEW coin crosses the line.")
     else:
         for c in fresh:
             ratio = c["total_volume"] / c["market_cap"] * 100
             chg = c.get("price_change_percentage_24h") or 0
-            send_telegram(token, chat_id,
+            ath_chg = c.get("ath_change_percentage")
+            ath_line = (f"\ndistance from ATH: <b>{abs(ath_chg):.1f}%</b>"
+                        if ath_chg is not None else "")
+            send_telegram(token, chat_ids,
                           f"🔔 <b>{c['symbol'].upper()}</b> ({c['name']}) crossed your threshold\n"
                           f"vol/mcap: <b>{ratio:.1f}%</b>\n"
                           f"market cap: {fmt_usd(c['market_cap'])}\n"
                           f"24h volume: {fmt_usd(c['total_volume'])}\n"
-                          f"price: ${c['current_price']:,} ({chg:+.1f}% 24h)")
+                          f"price: ${c['current_price']:,} ({chg:+.1f}% 24h)"
+                          f"{ath_line}")
             time.sleep(1)
 
     # save state so repeats aren't re-alerted (coins that drop out can re-alert later)

@@ -48,7 +48,7 @@
   @media (max-width:860px){ .grid{grid-template-columns:1fr;} }
   .panel { background:var(--panel); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
   .paneltitle { padding:10px 14px; border-bottom:1px solid var(--line); color:var(--dim);
-    font-size:11px; text-transform:uppercase; letter-spacing:1.5px; display:flex; justify-content:space-between; }
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px; display:flex; justify-content:space-between; gap:10px; }
   .count { color:var(--amber); }
   .row { display:grid; grid-template-columns:26px 1fr 110px; gap:10px 12px; padding:12px 14px;
     border-bottom:1px solid var(--panel2); align-items:center; }
@@ -58,6 +58,8 @@
   .name { color:var(--dim); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .nums { text-align:right; line-height:1.5; }
   .chg.up { color:var(--up); } .chg.down { color:var(--down); }
+  .ath { color:var(--dim); font-size:11px; }
+  .ath.near { color:var(--amber); }
   .gauge { grid-column:2/4; position:relative; height:16px; background:var(--panel2); border-radius:3px; }
   .fill { position:absolute; top:0; bottom:0; left:0; border-radius:3px;
     background:linear-gradient(90deg,#2A5C8A,var(--cyan)); }
@@ -99,6 +101,13 @@
       <input id="ratio" type="number" min="1" value="20">
     </div>
     <div class="field">
+      <label for="athPct">Near-ATH filter (max % below ATH)</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="athBtn">ATH filter off</button>
+        <input id="athPct" type="number" min="1" max="99" value="20" style="width:70px;">
+      </div>
+    </div>
+    <div class="field">
       <label for="ivl">Refresh every</label>
       <select id="ivl">
         <option value="30">30 seconds</option>
@@ -137,12 +146,12 @@
   var API = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&price_change_percentage=24h&page=";
 
   // ── state ──
-  var settings = { mcapM: 100, ratio: 20, interval: 60, muted: false };
+  var settings = { mcapM: 100, ratio: 20, interval: 60, muted: false, athOn: false, athPct: 20 };
   try {
     var saved = JSON.parse(localStorage.getItem("volpulse-settings") || "null");
     if (saved) settings = Object.assign(settings, saved);
   } catch (e) {}
-  var qualifying = {};   // coin id -> true (currently above threshold)
+  var qualifying = {};
   var firstScanDone = false;
   var alerts = [];
   var timer = null;
@@ -152,8 +161,10 @@
   var $ = function (id) { return document.getElementById(id); };
   $("mcap").value = settings.mcapM;
   $("ratio").value = settings.ratio;
+  $("athPct").value = settings.athPct;
   $("ivl").value = String(settings.interval);
   setSoundBtn();
+  setAthBtn();
 
   function save() {
     try { localStorage.setItem("volpulse-settings", JSON.stringify(settings)); } catch (e) {}
@@ -236,7 +247,7 @@
     var chain = Promise.resolve([]);
     for (let p = 1; p <= PAGES; p++) {
       chain = chain.then(function (acc) {
-        if (acc.length < (p - 1) * 250) return acc; // ran out of coins
+        if (acc.length < (p - 1) * 250) return acc;
         return fetchPage(p).then(function (d) { return acc.concat(d); });
       });
     }
@@ -246,11 +257,15 @@
         if (!c.market_cap || !c.total_volume) return;
         if (c.market_cap < settings.mcapM * 1e6) return;
         var ratio = (c.total_volume / c.market_cap) * 100;
-        if (ratio >= settings.ratio) {
-          found.push({ id:c.id, symbol:c.symbol, name:c.name, image:c.image,
-            price:c.current_price, market_cap:c.market_cap, total_volume:c.total_volume,
-            change24h:c.price_change_percentage_24h || 0, ratio:ratio });
+        if (ratio < settings.ratio) return;
+        var athChg = (typeof c.ath_change_percentage === "number") ? c.ath_change_percentage : null;
+        if (settings.athOn) {
+          // athChg is negative (% below the all-time high); require it not too deep
+          if (athChg === null || athChg < -settings.athPct) return;
         }
+        found.push({ id:c.id, symbol:c.symbol, name:c.name, image:c.image,
+          price:c.current_price, market_cap:c.market_cap, total_volume:c.total_volume,
+          change24h:c.price_change_percentage_24h || 0, ratio:ratio, athChg:athChg });
       });
       found.sort(function (a,b) { return b.ratio - a.ratio; });
 
@@ -281,7 +296,9 @@
 
   // ── rendering ──
   function renderMatches(found) {
-    $("matchTitle").textContent = "Matches — cap ≥ $" + settings.mcapM + "M · vol ≥ " + settings.ratio + "% of cap";
+    var title = "Matches — cap ≥ $" + settings.mcapM + "M · vol ≥ " + settings.ratio + "% of cap";
+    if (settings.athOn) title += " · ≤" + settings.athPct + "% below ATH";
+    $("matchTitle").textContent = title;
     $("matchCount").textContent = found.length;
     var box = $("matches");
     if (!found.length) {
@@ -293,12 +310,18 @@
       var pct = Math.min(100, c.ratio / maxRatio * 100);
       var tick = Math.min(100, settings.ratio / maxRatio * 100);
       var up = c.change24h >= 0;
+      var athTxt = "";
+      if (c.athChg !== null) {
+        var near = c.athChg >= -settings.athPct;
+        athTxt = '<div class="ath' + (near ? " near" : "") + '">' + Math.abs(c.athChg).toFixed(1) + '% below ATH</div>';
+      }
       return '<div class="row">' +
         '<img class="cimg" src="' + esc(c.image) + '" alt="">' +
         '<div class="coin"><span class="sym">' + esc(c.symbol.toUpperCase()) + '</span>' +
         '<span class="name">' + esc(c.name) + '</span></div>' +
         '<div class="nums"><div>' + fmtPrice(c.price) + '</div>' +
-        '<div class="chg ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + c.change24h.toFixed(1) + '% 24h</div></div>' +
+        '<div class="chg ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + c.change24h.toFixed(1) + '% 24h</div>' +
+        athTxt + '</div>' +
         '<div class="gauge"><div class="fill' + (c.ratio >= settings.ratio * 2 ? " hot" : "") + '" style="width:' + pct + '%"></div>' +
         '<div class="tick" style="left:' + tick + '%"></div>' +
         '<div class="ratio">' + c.ratio.toFixed(1) + '% · vol ' + fmtUsd(c.total_volume) + ' / cap ' + fmtUsd(c.market_cap) + '</div></div>' +
@@ -311,12 +334,14 @@
     if (alerts.length > 60) alerts.pop();
     $("alertCount").textContent = alerts.length;
     $("alerts").innerHTML = alerts.map(function (a) {
+      var athBit = a.c.athChg !== null ? ' · <b>' + Math.abs(a.c.athChg).toFixed(1) + '% below ATH</b>' : '';
       return '<div class="alert' + (a.initial ? "" : " fresh") + '">' +
         '<time>' + fmtTime(a.at) + '</time>' +
         '<span class="sym">' + esc(a.c.symbol.toUpperCase()) + '</span> ' +
         '<span class="name">' + (a.initial ? "already live at start" : "crossed threshold") + '</span>' +
         '<div class="abody">vol/mcap <b>' + a.c.ratio.toFixed(1) + '%</b> · cap <b>' + fmtUsd(a.c.market_cap) +
-        '</b> · 24h vol <b>' + fmtUsd(a.c.total_volume) + '</b> · price <b>' + fmtPrice(a.c.price) + '</b></div>' +
+        '</b> · 24h vol <b>' + fmtUsd(a.c.total_volume) + '</b> · price <b>' + fmtPrice(a.c.price) + '</b>' +
+        athBit + '</div>' +
         '</div>';
     }).join("");
   }
@@ -326,14 +351,31 @@
     if (timer) clearInterval(timer);
     timer = setInterval(scan, settings.interval * 1000);
   }
+  function resetAndRescan() {
+    qualifying = {}; firstScanDone = false; save(); scan();
+  }
   $("mcap").addEventListener("change", function () {
     settings.mcapM = Math.max(1, Number(this.value) || 1); this.value = settings.mcapM;
-    qualifying = {}; firstScanDone = false; save(); scan();
+    resetAndRescan();
   });
   $("ratio").addEventListener("change", function () {
     settings.ratio = Math.max(1, Number(this.value) || 1); this.value = settings.ratio;
-    qualifying = {}; firstScanDone = false; save(); scan();
+    resetAndRescan();
   });
+  $("athPct").addEventListener("change", function () {
+    settings.athPct = Math.min(99, Math.max(1, Number(this.value) || 20)); this.value = settings.athPct;
+    if (settings.athOn) resetAndRescan(); else save();
+  });
+  $("athBtn").addEventListener("click", function () {
+    settings.athOn = !settings.athOn;
+    setAthBtn();
+    resetAndRescan();
+  });
+  function setAthBtn() {
+    var b = $("athBtn");
+    b.textContent = settings.athOn ? "ATH filter on" : "ATH filter off";
+    b.classList.toggle("on", settings.athOn);
+  }
   $("ivl").addEventListener("change", function () {
     settings.interval = Number(this.value); save(); restart();
   });
@@ -344,7 +386,7 @@
   }
   $("soundBtn").addEventListener("click", function () {
     settings.muted = !settings.muted; setSoundBtn(); save();
-    if (!settings.muted) beep(); // audible confirmation + unlocks audio
+    if (!settings.muted) beep();
   });
 
   // ── go ──
