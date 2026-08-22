@@ -1,12 +1,10 @@
 {
  "qualifying": [
-  "cap-4",
   "first-digital-usd",
   "ripple-usd",
   "societe-generale-forge-eurcv",
   "united-stables",
   "usd-coin",
-  "usd1-wlfi",
-  "zama"
+  "usd1-wlfi"
  ]
 }
