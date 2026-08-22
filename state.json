@@ -1,13 +1,13 @@
 {
  "qualifying": [
-  "1inch",
   "aave",
   "apecoin",
+  "axie-infinity",
+  "basic-attention-token",
   "bonk",
   "cap-4",
   "cash-cat",
   "chiliz",
-  "crvusd",
   "curve-dao-token",
   "dash",
   "dogwifcoin",
@@ -27,11 +27,11 @@
   "monad",
   "official-trump",
   "optimism",
+  "ordinals",
   "pendle",
   "pepe",
   "plasma",
   "pudgy-penguins",
-  "pump-fun",
   "pyth-network",
   "ripple-usd",
   "societe-generale-forge-eurcv",
@@ -44,6 +44,7 @@
   "usd-coin",
   "usd1-wlfi",
   "virtual-protocol",
-  "worldcoin-wld"
+  "zama",
+  "zencash"
  ]
 }
