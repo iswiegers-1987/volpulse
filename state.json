@@ -3,7 +3,6 @@
   "1inch",
   "aave",
   "apecoin",
-  "axie-infinity",
   "bonk",
   "cap-4",
   "cash-cat",
@@ -32,6 +31,7 @@
   "pepe",
   "plasma",
   "pudgy-penguins",
+  "pump-fun",
   "pyth-network",
   "ripple-usd",
   "societe-generale-forge-eurcv",
@@ -43,6 +43,7 @@
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
-  "virtual-protocol"
+  "virtual-protocol",
+  "worldcoin-wld"
  ]
 }
