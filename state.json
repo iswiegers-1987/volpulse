@@ -1,5 +1,6 @@
 {
  "qualifying": [
+  "1inch",
   "aave",
   "apecoin",
   "axie-infinity",
@@ -24,6 +25,7 @@
   "injective-protocol",
   "layerzero",
   "lido-dao",
+  "melania-meme",
   "monad",
   "official-trump",
   "optimism",
@@ -34,6 +36,7 @@
   "pudgy-penguins",
   "pyth-network",
   "ripple-usd",
+  "sei-network",
   "societe-generale-forge-eurcv",
   "sonic-3",
   "sui",
@@ -44,6 +47,7 @@
   "usd-coin",
   "usd1-wlfi",
   "virtual-protocol",
+  "worldcoin-wld",
   "zama",
   "zencash"
  ]
