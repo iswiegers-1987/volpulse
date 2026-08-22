@@ -10,9 +10,7 @@
   "bonk",
   "cap-4",
   "cash-cat",
-  "celestia",
   "chiliz",
-  "crvusd",
   "curve-dao-token",
   "dash",
   "decentraland",
@@ -56,12 +54,12 @@
   "the-sandbox",
   "thorchain",
   "uniswap",
-  "unitas",
   "united-stables",
   "usd-coin",
   "usd1-wlfi",
   "virtual-protocol",
   "worldcoin-wld",
-  "zama"
+  "zama",
+  "zencash"
  ]
 }
